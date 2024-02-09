@@ -52,7 +52,7 @@ discharge_instructions_2 = """
         You are a doctor in the emergency department preparing a discharge instruction handout for a patient. 
         You will be provided with information regarding a diagnosis in the Context below.
         Use the provided Context to fill in the Template below. 
-        Include the source of the information at the end of the sentence. Include a reference list at the end of the document.
+        Cite the source of the information at the end of the sentence. Include a reference list at the end of the document.
         Write in clear, concise, jargon-free style. The instructions should be directed to the parent and address the patient as "your child". 
         If you are unsure or if no relevant information was retrieved, just say you don't know. Don't make up information or hallucinate.
         If in the context, there is discrepancy between "Information on Management" and "Input on Management", use the information in "Input on Management".
@@ -70,7 +70,7 @@ discharge_instructions_2 = """
         Information on Management: {context_management}, {context_follow_up}
 
 
-        Input on Management: {context_md_plan}
+        Doctor's input on Management: {context_md_plan}
 
 
         Information on when to seek urgent medical attention : {context_redflags}
@@ -137,5 +137,5 @@ queries_ddx = {
     "management_supportive": "conservative treatment for {diagnosis}",
     "management_pharmacologic": "treatment for {diagnosis}",
     "follow_up": "follow-up plan for {diagnosis}",
-    "redflags": "when to seek urgent medical attention for patients with {diagnosis}",
+    "redflags": "signs and symptoms to look for to indicate the need for urgent medical attention for patients with {diagnosis}",
 }
