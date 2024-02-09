@@ -1,0 +1,12 @@
+# OS generated files
+.DS_Store
+.env
+
+# Ignore the database
+resources/
+
+# Other
+__pycache__/
+jupyter_tests/
+.ipynb_checkpoints/
+*.ipynb
