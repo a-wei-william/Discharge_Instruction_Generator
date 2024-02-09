@@ -42,5 +42,7 @@ def get_pages_in_cat(category, agent, path):
 
 if __name__ == '__main__':
     wiki = wikipediaapi.Wikipedia("WikiMedDB (a.wei.william.0513@gmail.com)", "en")
-    get_pages_in_cat("Pediatrics", wiki, "./resources/wiki")
-
+    #get_pages_in_cat("Pediatrics", wiki, "./resources/wiki")
+    #get_pages_in_cat("Human diseases and disorders", wiki, "./resources/wiki")
+    get_pages_in_cat("Disorders originating in the perinatal period", wiki, "./resources/wiki")
+    get_pages_in_cat("Medical_emergencies", wiki, "./resources/wiki")
