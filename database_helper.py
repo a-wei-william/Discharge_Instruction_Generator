@@ -100,6 +100,14 @@ def create_collection_from_directory_md(directory_path, db_directory, emb_func):
             )
             splits = []
 
+    # to capture the remainder split <100 docs
+    db = Chroma.from_documents(
+                collection_name = "main_collection",
+                documents = splits,
+                embedding = emb_func,
+                persist_directory=db_directory
+            )
+
     print("num of files added: ", count)
 
 
