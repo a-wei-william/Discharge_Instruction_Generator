@@ -1,7 +1,9 @@
 """parsed then embed html pages and add to vector database 
     -collection is called main_collection
+    -from_documents will append embeddings to existing collection, including duplicates
 """
 
+import re
 from _global import path_to_resources, hf_embed
 from langchain.document_loaders import DirectoryLoader, TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter, MarkdownHeaderTextSplitter
@@ -49,6 +51,7 @@ def create_collection_from_directory_md(directory_path, db_directory, emb_func):
     
         -collection cotains evidence from all the source from one file type (dont need to create different
             collections for different sources as they will need to use the same retriever)
+        -files will have their source url at the end of the file
     """
     headers_to_split_on = [
         ("#", "Title"),
@@ -70,11 +73,20 @@ def create_collection_from_directory_md(directory_path, db_directory, emb_func):
     count = 0
     splits = []
     for doc in docs:
+        
+        # find and extract the URL
+        url_pattern = r"\n\n ## Source \n\n (.+)$"
+        match = re.search(url_pattern, doc.page_content, flags=re.MULTILINE)
+        if match:
+            url = match.group(1)
+            # Remove the matched section from the doc.page_content
+            doc.page_content = re.sub(url_pattern, "", doc.page_content, flags=re.MULTILINE)
+
         split = MarkdownHeaderTextSplitter(headers_to_split_on=headers_to_split_on).split_text(doc.page_content)
 
         # add source metadata
         for chunk in split:
-            chunk.metadata["source"] = doc.metadata["source"].split("/")[-1].replace(".md","")
+            chunk.metadata["source"] = url
 
         splits.extend(split)
 
@@ -93,7 +105,7 @@ def create_collection_from_directory_md(directory_path, db_directory, emb_func):
 
 
 if __name__ == "__main__":
-    create_collection_from_directory_txt(
+    create_collection_from_directory_md(
         directory_path = f"{path_to_resources}/wiki",
         db_directory = f"{path_to_resources}/db_wiki", 
         emb_func = hf_embed
