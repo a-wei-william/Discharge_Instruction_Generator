@@ -1,12 +1,9 @@
-#################################################
-# Program Name:scrape_wiki
-# Notes:
-# - Scrape a wikipedia page 
-# - encodes url in the file name
-# - parses out the "See also", "References", "External links" sections
-# Bugs:
-#
-#################################################
+"""Scrape_wiki
+- Scrape a wikipedia page 
+- encodes url in the file name
+- parses out the "See also", "References", "External links" sections
+"""
+
 
 import wikipediaapi
 import re
