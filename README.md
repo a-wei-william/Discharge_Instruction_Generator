@@ -29,4 +29,6 @@
     - LLama2-13B: for retrieval content compression
 - UI: Gradio
 
+![scehmatic](schematic.png)
+
 ![demo img](demo.png)
