@@ -5,6 +5,7 @@ evaluate by asking for human evaluation
 
 import os
 import random
+import json
 import gradio as gr
 
 
@@ -60,6 +61,13 @@ def combine_test_sets(llm, human):
         
     return test_set
 
+
+def save_test_results(results, dir):
+    """save the results of the AB test"""
+    print("saving results")
+    filename = os.path.join(dir, 'results.json')
+    with open(filename, 'w') as file:
+        json.dump(results, file)
 
 
 def render(generator, results):
@@ -126,7 +134,9 @@ def render(generator, results):
                 disease, hd1, hd2 = next(generator)
             except StopIteration:
                 print(results)
-                return "No more handouts", "please exit", "please exit", left_llm, None
+                save_test_results(results, "./test_results")
+                return None, "Test is finished. Thank you for participating. You can close this window now", "Test is finished. Thank you for participating. You can close this window now", None, None
+
             
             # randomize the display
             left_llm = random.random() < 0.5
@@ -156,7 +166,6 @@ def run_AB_test(ts):
     AB_generator = _AB_generator(ts)
     results = {} # dict of disease: superior handout
     demo = render(AB_generator, results)
-
     demo.launch(inbrowser=True)
 
 
@@ -172,12 +181,14 @@ if __name__ == '__main__':
 
     ts = {
         "asthma": ("llm generated handout asthma", "human generated handout asthma"),
+    }
+    """
         "covid": ("llm generated handout covid", "human generated handout covid"),
         "diabetes": ("llm generated handout dm", "human generated handout dm"),
         "hypertension": ("llm generated handout htn", "human generated handout htn"),
         "pneumonia": ("llm generated handout pne", "human generated handout pne")
     }
-
+    """
 
     run_AB_test(ts)
 
