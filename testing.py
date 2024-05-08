@@ -9,32 +9,42 @@ import json
 import gradio as gr
 
 
-def create_test_set(dir):
+def create_test_set(dir, write=False, dir_save=None):
     """generates the handouts from the patient cases in test_set"""
     print("generating handouts")
     test_set = {}
     for filename in os.listdir(dir):
         if filename.endswith('.json'):
             with open(os.path.join(dir,filename), 'r') as file:
+                filename = filename.replace(".txt","")
                 data = json.load(file)
                 assessment = data['assessment']
                 plan = data['plan']
-                test_set[filename.replace(".txt","")] = generate(assessment, plan)
+                test_set[filename] = generate(assessment, plan)
+
+                if write:
+                    with open(os.path.join(dir_save, filename), 'w') as file:
+                        file.write(test_set[filename])
+
 
     print(f"total num of handout generated: {len(test_set)}")
+    if write:
+        print(f"generated handout saved at {dir_save}")
 
     return test_set
 
 
 
-def write_test_set(test_set, dir):
-    """save the generated handouts"""
-    print("saving generated handouts")
-    for k,v in test_set.items():
-        filename = f"{k}.txt"
-        with open(os.path.join(dir,filename), 'w') as file:
-            file.write(v)
-
+def write_test_case(dir):
+    """write jason files"""
+    while True:
+        print([x for x in os.listdir(dir) if x.endswith(".json")])
+        disease = input("Name of disease/condition/diagnosis: ").lower()
+        assessment = input("Assessment: ")
+        plan = input("Plan: ")
+        filename = os.path.join(dir, f"{disease}.json")
+        with open(filename, 'w') as file:
+            json.dump({"assessment": assessment, "plan": plan}, file)
 
 
 def read_test_set(dir):
@@ -172,24 +182,13 @@ def run_AB_test(ts):
 
 if __name__ == '__main__':
     """
-    ts_llm = create_test_set("./test_set/pt")
-    write_test_set(ts, "./test_set/llm")
+    ts_llm = create_test_set("./test_set/cases")
+    
     ts_hum = read_test_set("./test_set/human")
     ts = combine_test_sets(ts_llm, ts_hum)
     """
 
+    #run_AB_test(ts)
 
-    ts = {
-        "asthma": ("llm generated handout asthma", "human generated handout asthma"),
-    }
-    """
-        "covid": ("llm generated handout covid", "human generated handout covid"),
-        "diabetes": ("llm generated handout dm", "human generated handout dm"),
-        "hypertension": ("llm generated handout htn", "human generated handout htn"),
-        "pneumonia": ("llm generated handout pne", "human generated handout pne")
-    }
-    """
-
-    run_AB_test(ts)
-
+    write_test_case("./test_set/cases")
 
