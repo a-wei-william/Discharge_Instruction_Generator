@@ -1,6 +1,7 @@
-"""parsed then embed html pages and add to vector database 
+""" functions to add collection to the vector database 
     -collection is called main_collection
     -from_documents will append embeddings to existing collection, including duplicates
+    -the .md files should have a ## Source at the bottom of the file to use as metadata
 """
 
 import re

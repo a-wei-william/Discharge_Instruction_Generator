@@ -1,4 +1,4 @@
-"""file with global variables for all modules"""
+"""global variables for all modules"""
 
 # set up env
 from dotenv import load_dotenv
