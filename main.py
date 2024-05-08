@@ -35,7 +35,7 @@ prompt_main = ChatPromptTemplate.from_messages([("system",discharge_instructions
 
 
 # set up parallel chain components
-chain_extract_diagnosis = prompt_extract_diagnosis | llm_gpt
+#chain_extract_diagnosis = prompt_extract_diagnosis | llm_gpt
 
 fill_queries = RunnableParallel( # fill in queries with the diagnosis 
     query_definition = lambda x: queries_ddx["definition"].format(diagnosis=x["diagnosis"]),
@@ -61,7 +61,7 @@ get_cotext = {
 # main chain
 main_chain = (
     {
-        "diagnosis": RunnablePassthrough() | chain_extract_diagnosis,
+        "diagnosis": itemgetter("assessment"), #RunnablePassthrough() | chain_extract_diagnosis,
         "md_plan": itemgetter("md_plan"),
     }
     | fill_queries
@@ -83,37 +83,39 @@ main_chain = (
 def generate(assessment, plan):
     return main_chain.invoke({"assessment": assessment, "md_plan": plan})
 
-# UI
-eg_assessment = """\
-5 yo M, first asthma exacerbation of the year likely secondary to a viral infection, responded well to asthma protocol, now stable in room air on q4h venolin. Reduced fluid intake due to sore throat (likely viral pharyngitis) but euvolemic on exam and no signs of bacterial infection of the throat. 
-"""
-eg_plan = """\
-- continue q4h ventolin for the next 48hr then prn
-- continue flovent 125mcg qdaily
-- follow-up with family doctor if not improved by 2 days
-"""
 
-
-with gr.Blocks() as demo:
-    gr.Markdown("""
-        # Discharge Instruction Generator
-        This is a demo for the discharge instruction generator. 
-        Please input your assessment and plan of the patient in the corresponding boxes. 
-    """)
-    with gr.Row():
-        with gr.Column():
-            assessment = gr.Text(label="Assessment/Impression", lines=10,
-                                 value=eg_assessment)
-            plan = gr.Text(label="Plan", lines=10, 
-                           value=eg_plan)
-            btn_gen = gr.Button("Generate", variant="primary")
-        with gr.Column():
-            output = gr.Text(label="Generated Discharge Instructions", lines=20)
-    
-    btn_gen.click(generate, inputs=[assessment, plan], outputs=[output])
     
 
 if __name__ == "__main__":
+    # UI
+    eg_assessment = """\
+    5 yo M, first asthma exacerbation. 
+    """
+    eg_plan = """\
+    - continue q4h ventolin for the next 48hr then prn
+    - continue flovent 125mcg qdaily
+    - follow-up with family doctor if not improved by 2 days
+    """
+
+
+    with gr.Blocks() as demo:
+        gr.Markdown("""
+            # Discharge Instruction Generator
+            This is a demo for the discharge instruction generator. 
+            Please input your assessment and plan of the patient in the corresponding boxes. 
+        """)
+        with gr.Row():
+            with gr.Column():
+                assessment = gr.Text(label="Assessment/Impression", lines=10,
+                                     value=eg_assessment)
+                plan = gr.Text(label="Plan", lines=10, 
+                               value=eg_plan)
+                btn_gen = gr.Button("Generate", variant="primary")
+            with gr.Column():
+                output = gr.Text(label="Generated Discharge Instructions", lines=20)
+        
+        btn_gen.click(generate, inputs=[assessment, plan], outputs=[output])
+    
     demo.launch(inbrowser=True)
 
     """    import time
@@ -121,7 +123,7 @@ if __name__ == "__main__":
 
         result = main_chain.invoke({
             "assessment": "5 yo M, first asthma exacerbation of the year likely secondary to a viral infection, responded well to asthma protocol, now stable in room air on q4h venolin. Reduced fluid intake due to sore throat (likely viral pharyngitis) but euvolemic on exam and no signs of bacterial infection of the throat.",
-            "md_plan":"asfadfs"
+            "md_plan":"continue q4h ventolin for the next 24hours. follow-up with your family doctor in the next few days."
         })
 
         end_time = time.time()
