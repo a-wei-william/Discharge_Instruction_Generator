@@ -50,30 +50,30 @@ discharge_instructions = """
 discharge_instructions_2 = """
     Instruction:
         You are a doctor in the emergency department preparing a discharge instruction handout for a patient. 
-        You will be provided with information regarding a diagnosis in the Context below.
-        Use the provided Context to fill in the Template below. 
-        Cite the source of the information at the end of the sentence. Include a reference list at the end of the document.
-        Write in clear, concise, jargon-free style. The instructions should be directed to the parent and address the patient as "your child". 
-        If you are unsure or if no relevant information was retrieved, just say you don't know. Don't make up information or hallucinate.
-        If in the context, there is discrepancy between "Information on Management" and "Input on Management", use the information in "Input on Management".
+        You will be provided with information regarding a diagnosis in the Context below, which you will use to generate the handout by filling in the Template below.
+        Include a reference list of urls at the bottom of the handout.
+        Write in clear, concise, no jargon language. 
+        The instructions should be directed to the parent and address the patient as "your child". 
+        If you are unsure or if no relevant information was retrieved, say you do not know. Do NOT make up information not provided in the Context.
+        If there is discrepancy between "Information on Management" provided in the Context and "Input on Management" provided by the physician, use the information in "Input on Management".
     ---
     Context:
-        Information on the Definition: {context_definition}
+        Information on the Definition of the disease: {context_definition}
 
 
-        Information on the Presentation: {context_presentation}
+        Information on the Presentation of the disease: {context_presentation}
 
 
-        Information on the Course: {context_course}
+        Information on the Course of the disease: {context_course}
 
 
-        Information on Management: {context_management}, {context_follow_up}
+        Information on Management of the disease: {context_management}, {context_follow_up}
 
 
-        Doctor's input on Management: {context_md_plan}
+        Doctor's input on Management of the disease: {context_md_plan}
 
 
-        Information on when to seek urgent medical attention : {context_redflags}
+        Information on when to seek urgent medical attention for the diesease: {context_redflags}
 
 
     ---
@@ -137,5 +137,5 @@ queries_ddx = {
     "management_supportive": "conservative treatment for {diagnosis}",
     "management_pharmacologic": "treatment for {diagnosis}",
     "follow_up": "follow-up plan for {diagnosis}",
-    "redflags": "signs and symptoms to look for to indicate the need for urgent medical attention for patients with {diagnosis}",
+    "redflags": "signs and symptoms that indicate the need for urgent medical attention for patients with {diagnosis}",
 }
