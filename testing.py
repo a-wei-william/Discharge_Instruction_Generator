@@ -7,6 +7,7 @@ import os
 import random
 import json
 import gradio as gr
+from main import generate
 
 
 def create_test_set(dir, write=False, dir_save=None):
@@ -16,16 +17,16 @@ def create_test_set(dir, write=False, dir_save=None):
     for filename in os.listdir(dir):
         if filename.endswith('.json'):
             with open(os.path.join(dir,filename), 'r') as file:
-                filename = filename.replace(".txt","")
+                disease = filename.replace(".json","")
                 data = json.load(file)
                 assessment = data['assessment']
                 plan = data['plan']
-                test_set[filename] = generate(assessment, plan)
+                print(f"Disease: {disease} \n", assessment,"\n", plan)
+                test_set[disease] = generate(assessment, plan)
 
                 if write:
-                    with open(os.path.join(dir_save, filename), 'w') as file:
-                        file.write(test_set[filename])
-
+                    with open(os.path.join(dir_save, f"{disease}.txt"), 'w') as file:
+                        file.write(test_set[disease])
 
     print(f"total num of handout generated: {len(test_set)}")
     if write:
@@ -39,7 +40,7 @@ def write_test_case(dir):
     """write jason files"""
     while True:
         print([x for x in os.listdir(dir) if x.endswith(".json")])
-        disease = input("Name of disease/condition/diagnosis: ").lower()
+        disease = input("Name of disease/condition/diagnosis: ").lower().replace(" ","_")
         assessment = input("Assessment: ")
         plan = input("Plan: ")
         filename = os.path.join(dir, f"{disease}.json")
@@ -190,5 +191,6 @@ if __name__ == '__main__':
 
     #run_AB_test(ts)
 
-    write_test_case("./test_set/cases")
+    #write_test_case("./test_set/cases")
 
+    #ts_llm = create_test_set("./test_set/cases", write=True, dir_save="./test_set/llm")
