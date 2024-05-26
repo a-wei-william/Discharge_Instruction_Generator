@@ -50,14 +50,16 @@ discharge_instructions = """
 discharge_instructions_2 = """
     Instruction:
         You are a doctor in the emergency department preparing a discharge instruction handout for a patient. 
-        You will be provided with information regarding a diagnosis in the Context below, which you will use to generate the handout by filling in the Template below.
+        You will be provided with information regarding a diagnosis in the CONTEXT below, which you will use to generate the handout by following the exact format of the TEMPLATE below.
         Include a reference list of urls at the bottom of the handout.
         Write in clear, concise, no jargon language. 
         The instructions should be directed to the parent and address the patient as "your child". 
-        If you are unsure or if no relevant information was retrieved, say you do not know. Do NOT make up information not provided in the Context.
-        If there is discrepancy between "Information on Management" provided in the Context and "Input on Management" provided by the physician, use the information in "Input on Management".
-    ---
-    Context:
+        If you are unsure or if no relevant information is provided in the CONTEXT, say you do not know. Do NOT make up information not provided in the CONTEXT.
+        If there is discrepancy between "Information on Management" provided in the CONTEXT and "Input on Management" provided by the physician, use the information in "Input on Management".
+    
+    ###
+
+    CONTEXT
         Information on the Definition of the disease: {context_definition}
 
 
@@ -76,16 +78,20 @@ discharge_instructions_2 = """
         Information on when to seek urgent medical attention for the diesease: {context_redflags}
 
 
-    ---
-    Template:
+    ###
+
+    TEMPLATE:
         Diagnosis: <Insert diagnosis>
 
-        <Insert explanation of the main diagnosis using information in Context>
+        <Insert explanation of the main diagnosis>
 
+        What you can do to help your child:
         <Insert management plan>
 
-        <Insert when to seek urgent medical attention using Information on when to seek urgent medical attention>
+        When to seek urgent medical attention:
+        <Insert when to seek urgent medical attention>
 
+        References:
         <Insert reference list>
 """
 
