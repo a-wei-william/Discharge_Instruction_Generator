@@ -4,14 +4,13 @@ import gradio as gr
 from operator import itemgetter
 from _global import path_to_resources, hf_embed
 from templates import discharge_instructions, discharge_instructions_2, queries_ddx, extract_diagnosis, compress_context
-from langchain.vectorstores import Chroma
-from langchain.chat_models import ChatOpenAI
-from langchain.llms import Ollama
-from langchain.prompts import ChatPromptTemplate, PromptTemplate
-from langchain.schema import StrOutputParser
-from langchain.schema.runnable import RunnablePassthrough, RunnableParallel
-from langchain.callbacks.manager import CallbackManager
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from langchain_community.vectorstores import Chroma
+from langchain_openai import ChatOpenAI
+from langchain_community.llms import Ollama
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.output_parsers.string import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel
+from langchain.callbacks.tracers import LangChainTracer
 
 
 # set up LLM
@@ -27,7 +26,7 @@ retriever = db.as_retriever(
 
 # compress context
 prompt_compress = PromptTemplate.from_template(compress_context)
-compressor =  prompt_compress | llm_llama | StrOutputParser()
+compressor =  prompt_compress #| llm_llama | StrOutputParser()
 
 # set up prompts
 prompt_extract_diagnosis = PromptTemplate.from_template(extract_diagnosis)
@@ -35,7 +34,7 @@ prompt_main = ChatPromptTemplate.from_messages([("system",discharge_instructions
 
 
 # set up parallel chain components
-#chain_extract_diagnosis = prompt_extract_diagnosis | llm_gpt
+chain_extract_diagnosis = prompt_extract_diagnosis | llm_gpt
 
 fill_queries = RunnableParallel( # fill in queries with the diagnosis 
     query_definition = lambda x: queries_ddx["definition"].format(diagnosis=x["diagnosis"]),
@@ -49,19 +48,19 @@ fill_queries = RunnableParallel( # fill in queries with the diagnosis
 
 
 get_cotext = {
-    "definition": {"context": itemgetter("query_definition") | retriever, "query": RunnablePassthrough()} | compressor,
-    "presentation": {"context": itemgetter("query_presentation") | retriever, "query": RunnablePassthrough()} | compressor,
-    "course": {"context": itemgetter("query_course") | retriever, "query": RunnablePassthrough()} | compressor,
-    "management": {"context": itemgetter("query_management") | retriever, "query": RunnablePassthrough()} | compressor,
-    "follow_up": {"context": itemgetter("query_follow_up") | retriever, "query": RunnablePassthrough()} | compressor,
-    "redflags": {"context": itemgetter("query_redflags") | retriever, "query": RunnablePassthrough()} | compressor,
+    "definition": {"context": itemgetter("query_definition") | retriever, "query": itemgetter("query_definition")} | compressor,
+    "presentation": {"context": itemgetter("query_presentation") | retriever, "query": itemgetter("query_presentation")} | compressor,
+    "course": {"context": itemgetter("query_course") | retriever, "query": itemgetter("query_course")} | compressor,
+    "management": {"context": itemgetter("query_management") | retriever, "query": itemgetter("query_management")} | compressor,
+    "follow_up": {"context": itemgetter("query_follow_up") | retriever, "query": itemgetter("query_follow_up")} | compressor,
+    "redflags": {"context": itemgetter("query_redflags") | retriever, "query": itemgetter("query_redflags")} | compressor,
 }
 
 
 # main chain
 main_chain = (
     {
-        "diagnosis": itemgetter("assessment"), #RunnablePassthrough() | chain_extract_diagnosis,
+        "diagnosis": itemgetter("assessment") | RunnablePassthrough() | chain_extract_diagnosis,
         "md_plan": itemgetter("md_plan"),
     }
     | fill_queries
@@ -88,6 +87,7 @@ def generate(assessment, plan):
 
 if __name__ == "__main__":
     # UI
+    '''import gradio as gr
     eg_assessment = """\
     5 yo M, first asthma exacerbation. 
     """
@@ -117,17 +117,12 @@ if __name__ == "__main__":
         btn_gen.click(generate, inputs=[assessment, plan], outputs=[output])
     
     demo.launch(inbrowser=True)
+    '''
 
-    """    import time
-        start_time = time.time()
-
-        result = main_chain.invoke({
-            "assessment": "5 yo M, first asthma exacerbation of the year likely secondary to a viral infection, responded well to asthma protocol, now stable in room air on q4h venolin. Reduced fluid intake due to sore throat (likely viral pharyngitis) but euvolemic on exam and no signs of bacterial infection of the throat.",
-            "md_plan":"continue q4h ventolin for the next 24hours. follow-up with your family doctor in the next few days."
-        })
-
-        end_time = time.time()
-        print("Time taken: ", end_time - start_time)
-
-        print(result)
-    """
+    # test
+    result = main_chain.invoke({
+        "assessment": "5 yo M, first asthma exacerbation of the year likely secondary to a viral infection, responded well to asthma protocol, now stable in room air on q4h venolin. Reduced fluid intake due to sore throat (likely viral pharyngitis) but euvolemic on exam and no signs of bacterial infection of the throat.",
+        "md_plan":"continue q4h ventolin for the next 24hours. follow-up with your family doctor in the next few days."
+    })
+    
+   
