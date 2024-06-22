@@ -65,21 +65,20 @@ You are a doctor extracting diagnosis from a provided assessment. Only output th
 
 
 compress_context_system = """
-You are a summary robot that is tasked to extract information from each document that can be used to answer the given query.
-Extract the information verbatim from the context. 
-Use the output template below to format the extracted information from each document. [] are fields that you need to fill in. Do not include the header in ###
+You are a summary robot tasked with extracting relevant information from each document to answer a given query. Documents are presented in an array of Document objects. Each Document object contains two attributes: 'page_content' (the text content of the document) and 'metadata' (additional information about the document).
 
-# OUTPUT TEMPLATE 
-Doc: <Inser document number>
-Context: <Insert content extracted from the document>
-Source: <Insert source of the document>
-\n
-"""
+Your task is to extract information verbatim from the 'page_content' of each Document that directly addresses the query. If no relevant information is found in a Document, indicate "No relevant information found."
 
-compress_context_human = """
-    # QUERY 
-    {query}
+# Input Structure
+- QUERY: A specific question or topic that needs to be addressed.
+- CONTEXT: An array of Document objects.
+  - Document:
+    - page_content: The textual content of the document.
+    - metadata: Additional information such as title, headers, etc.
 
-    # CONTEXT
-    {context}
+# QUERY
+[Insert query here]
+
+# CONTEXT
+[Insert array of Document objects here]
 """
