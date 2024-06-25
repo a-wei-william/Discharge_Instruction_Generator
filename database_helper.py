@@ -6,9 +6,10 @@
 
 import re
 from _global import path_to_resources, hf_embed
-from langchain.document_loaders import DirectoryLoader, TextLoader
+from langchain_community.document_loaders import TextLoader, DirectoryLoader
+from langchain_community.vectorstores import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter, MarkdownHeaderTextSplitter
-from langchain.vectorstores import Chroma
+
 
 
 def create_collection_from_directory_txt(directory_path, db_directory, emb_func):
@@ -76,8 +77,10 @@ def create_collection_from_directory_md(directory_path, db_directory, emb_func):
     for doc in docs:
         
         # find and extract the URL
-        url_pattern = r"\n\n ## Source \n\n (.+)$"
+        url_pattern = r"\s*## Source\s*\n\s*(https?://[^\s]+)"
         match = re.search(url_pattern, doc.page_content, flags=re.MULTILINE)
+        url = None
+
         if match:
             url = match.group(1)
             # Remove the matched section from the doc.page_content
@@ -86,8 +89,9 @@ def create_collection_from_directory_md(directory_path, db_directory, emb_func):
         split = MarkdownHeaderTextSplitter(headers_to_split_on=headers_to_split_on).split_text(doc.page_content)
 
         # add source metadata
-        for chunk in split:
-            chunk.metadata["source"] = url
+        if url:
+            for chunk in split:
+                chunk.metadata["source"] = url
 
         splits.extend(split)
 
@@ -115,21 +119,21 @@ def create_collection_from_directory_md(directory_path, db_directory, emb_func):
 
 if __name__ == "__main__":
     create_collection_from_directory_md(
-        directory_path = f"{path_to_resources}/wiki",
-        db_directory = f"{path_to_resources}/db_wiki", 
+        directory_path = f"{path_to_resources}/health_CA",
+        db_directory = f"{path_to_resources}/db_main", 
         emb_func = hf_embed
     )
 
-    """
+    
     create_collection_from_directory_md(
-        directory_path = f"{path_to_resources}/caringforkids",
-        db_directory = f"{path_to_resources}/db", 
+        directory_path = "/Users/a_wei/Downloads/programming/llm/OLD_ED_Counseling_Generator/resources/caringforkids",
+        db_directory = f"{path_to_resources}/db_main", 
         emb_func = hf_embed
     )
 
     create_collection_from_directory_md(
-        directory_path = f"{path_to_resources}/cps_statements/",
-        db_directory = f"{path_to_resources}/db", 
+        directory_path = "/Users/a_wei/Downloads/programming/llm/OLD_ED_Counseling_Generator/resources/cps_statements/",
+        db_directory = f"{path_to_resources}/db_main", 
         emb_func = hf_embed
     )
-    """
+    
