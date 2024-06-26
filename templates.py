@@ -69,16 +69,21 @@ You are a summary robot tasked with extracting relevant information from each do
 
 Your task is to extract information verbatim from the 'page_content' of each Document that directly addresses the query. If no relevant information is found in a Document, indicate "No relevant information found."
 
+Format the output as a CompressedDocs Pydantic model.
+
 # Input Structure
 - QUERY: A specific question or topic that needs to be addressed.
 - CONTEXT: An array of Document objects.
   - Document:
-    - page_content: The textual content of the document.
+    - page_content: The textual content of the document. Special characters should be escaped in JSON compatible format.
     - metadata: Additional information such as title, headers, etc.
+"""
 
+
+compress_context_human = """
 # QUERY
-[Insert query here]
+{query}
 
 # CONTEXT
-[Insert array of Document objects here]
+{context}
 """
