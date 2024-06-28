@@ -9,24 +9,26 @@
 - The current state-of-the-art large language models (LLMs) may be able to generate reasonable and safe discharge instructions given the impression and plan of the patient. However, LLMs are susceptible to hallucinations, and without knowing where the LLMs derive the content from, there may be a lack of trust from adoption by physicians and patients/families.
 
 ## Solution
-- An application that generates discharge instructions for patients and families based on the patient's diagnosis and physician's management plan. The information will be derived from up-to-date trusted healthcare information sources in Canada and will be cited. In addition, the generated discharge instructions are not dependent on pre-generated templates and will be tailored to the individual patient. 
+- An application that generates discharge instructions for patients and families based on the patient's diagnosis and physician's management plan. The information will be derived from up-to-date trusted healthcare information sources. In addition, the generated discharge instructions are not dependent on pre-generated templates and will be tailored to the individual patient. 
 - The aim is to reduce the amount of time physician spend on writing/editing of discharge instructions. Physicians will only have to proofread the discharge instruction before printing it.
 
 ## Data Sources
-- Wikipedia (easily accessible opensource information. only used as a proof of concept at this stage)
-- Data sources can be extended to any available healthcare information sources requested by the healthcare institution 
+- Openly available trusted healthcare information sources on the internet 
 
 ## Blueprint
-- Data parsers that clean and transform raw information in to chunks that can be stored in the vector database
+- Data parsers that clean and transform raw information into chunks that can be embedded and stored in the vector database
 - Vector database: custom-built vector database (chroma) using information from trusted healthcare information sources
-- Input: De-identified information on the assessment and plan of the patient
+- Inputs: De-identified information on the assessment and plan of the patient
 - Prompt templates: 
     - for diagnosis extraction from the assessment statement provided
     - for discharge instruction generation
-- Embedding: Hugging Face-gbe
+- Embedding: BAAI/llm-embedder
 - LLM: 
-    - OpenAI-GPT3.5: for letter generation
-    - LLama2-13B: for retrieval content compression
+    - OpenAI-GPT3.5: for context compression and handout generation
+    - (in progess) to test with OpenAI-GPT4
+- Framework: 
+    - LangChain: for prototyping the application
+    - LangSmith: for evaluation 
 - UI: Gradio
 
 ![scehmatic](schematic.png)
