@@ -1,27 +1,27 @@
 # ED Discharge Instruction Generator
 
 ## Aim
-- The aim of this project is to create a retrieval augmented generation (RAG) discharge instruction generator.
+- The aim of this project is to create a discharge instruction/handout generator that utilizes retrieval augmented generation (RAG) to improve information accuracy.
 
-## Motivation
-- After a patient is seen in the emergency department and is deemed medically safe to be discharged, the standard practice is to counsel the patient and family regarding instructions to follow at home, and to provide a written summary of the discharge instructions. Although there are pre-generated templates (i.e., auto-text) available on the EMR, the list of templates is not exhaustive, and oftentimes, not tailored to the patient being discharged.
-- As a result, for somewhat common diseases where template discharge instructions are not available, physicians need to manually type out the discharge instructions. For diseases with available templates on EMR, physicians are still required to manually modify the template according to the patient's situation. This leads to time wasted on writing/modifying discharge instructions and increases the risk of errors being made.
-- The current state-of-the-art large language models (LLMs) may be able to generate reasonable and safe discharge instructions given the impression and plan of the patient. However, LLMs are susceptible to hallucinations, and without knowing where the LLMs derive the content from, there may be a lack of trust from adoption by physicians and patients/families.
+## Problem Statement
+- After a patient is deemed medically safe to be discharged from the emergency department, the standard of care involves counseling the patient and their family on discharge instructions and providing a written summary. While electronic medical records offer pre-generated templates, these templates are often not exhaustive and may not be tailored to the patient's circumstances.
+- For common conditions without available templates, physicians must manually type discharge instructions. Even when templates are available, physicians often need to modify them to suit the patient's situation. This process is time-consuming and increases the risk of errors.
+- Current large language models (LLMs) can generate reasonable and safe discharge instructions based on the patient's condition. However, LLMs can produce hallucinations, leading to potential mistrust from physicians and patients due to the lack of transparency in content generation.
 
 ## Solution
-- An application that generates discharge instructions for patients and families based on the patient's diagnosis and physician's management plan. The information will be derived from up-to-date trusted healthcare information sources. In addition, the generated discharge instructions are not dependent on pre-generated templates and will be tailored to the individual patient. 
-- The aim is to reduce the amount of time physician spend on writing/editing of discharge instructions. Physicians will only have to proofread the discharge instruction before printing it.
+- An application that generates personalized discharge instructions based on the patient's individaul clinical scenario, using information from up-to-date and trusted healthcare sources. 
+- This approach eliminates dependency on pre-generated templates and tailors instructions to individual patients, aiming to reduce the time physicians spend writing or editing discharge instructions. Physicians will only need to proofread the generated instructions before printing.
 
 ## Data Sources
-- Openly available trusted healthcare information sources on the internet 
+- Openly available, trusted healthcare information sources on the internet 
 
 ## Blueprint
-- Data parsers that clean and transform raw information into chunks that can be embedded and stored in the vector database
-- Vector database: custom-built vector database (chroma) using information from trusted healthcare information sources
+- Data parsers: clean and transform raw information into chunks that can be embedded and stored in the vector database
+- Vector database: custom-built Chroma database using information from trusted healthcare information sources
 - Inputs: De-identified information on the assessment and plan of the patient
 - Prompt templates: 
-    - for diagnosis extraction from the assessment statement provided
-    - for discharge instruction generation
+    - Diagnosis extraction from the assessment statement provided
+    - Discharge instruction generation
 - Embedding: BAAI/llm-embedder
 - LLM: 
     - OpenAI-GPT3.5: for context compression and handout generation
