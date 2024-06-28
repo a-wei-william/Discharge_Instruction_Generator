@@ -31,6 +31,10 @@
     - LangSmith: for evaluation 
 - UI: Gradio
 
+## Workflow
+
 ![scehmatic](schematic.png)
+
+## Demo
 
 ![demo img](demo.png)
